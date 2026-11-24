@@ -56,6 +56,7 @@ def list_users():
         conn.close()
     return jsonify([dict(row) for row in rows])
 
+
 @app.get("/users/<int:user_id>")
 def get_user(user_id):
     conn = get_db()
@@ -68,5 +69,6 @@ def get_user(user_id):
     if row is None:
         return jsonify(error="not found"), 404
     return jsonify(dict(row))
+
 
 init_db()
