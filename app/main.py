@@ -71,4 +71,20 @@ def get_user(user_id):
     return jsonify(dict(row))
 
 
+@app.get("/search")
+def search_users():
+    # INTENTIONALLY VULNERABLE (VULN-01): SQL injection.
+    # The search term is inserted into the query with an f-string.
+    # Kept on purpose for this learning project. Compare with /users.
+    q = request.args.get("q", "")
+    conn = get_db()
+    try:
+        rows = conn.execute(
+            f"SELECT id, name, role FROM users WHERE name LIKE '%{q}%'"
+        ).fetchall()
+    finally:
+        conn.close()
+    return jsonify([dict(row) for row in rows])
+
+
 init_db()
