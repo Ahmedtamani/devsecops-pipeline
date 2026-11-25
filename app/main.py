@@ -1,4 +1,5 @@
 import sqlite3
+import subprocess
 
 from flask import Flask, jsonify, request
 
@@ -85,6 +86,18 @@ def search_users():
     finally:
         conn.close()
     return jsonify([dict(row) for row in rows])
+
+
+@app.get("/ping")
+def ping():
+    # INTENTIONALLY VULNERABLE (VULN-02): OS command injection.
+    # The host parameter is passed to a shell (shell=True) without validation.
+    # Kept on purpose for this learning project.
+    host = request.args.get("host", "127.0.0.1")
+    result = subprocess.run(
+        f"ping -c 1 {host}", shell=True, capture_output=True, text=True, timeout=5
+    )
+    return jsonify(returncode=result.returncode, output=result.stdout)
 
 
 init_db()
